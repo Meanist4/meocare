@@ -41,4 +41,4 @@ deploy_to_mon_server:
     - ssh-keyscan -H 192.168.11.110 >> ~/.ssh/known_hosts
   script:
     - scp -o BatchMode=yes meocare/target/*.jar root@192.168.11.110:/opt/meocare/meocare.jar
-    - ssh -o BatchMode=yes root@192.168.11.110 "pkill -f '[m]eocare.jar' || true; sleep 1; setsid nohup java -Xms256m -Xmx512m -jar /opt/meocare/meocare.jar </dev/null >/opt/meocare/app.log 2>&1 < /dev/null &"
+    - ssh -o BatchMode=yes root@192.168.11.110 "systemctl restart meocare"
