@@ -4,7 +4,7 @@ stages:
   - deploy
 
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
 cache:
   key: "$CI_COMMIT_REF_SLUG"
@@ -41,3 +41,4 @@ deploy_to_mon_server:
     - scp meocare/target/*.jar root@192.168.11.110:/opt/meocare/meocare.jar
     - ssh root@192.168.11.110 "pkill -f 'meocare.jar' || true; nohup java -Xms256m -Xmx512m -jar /opt/meocare/meocare.jar > /opt/meocare/app.log 2>&1 &"
 EOF
+sed -i 's/\t/  /g; s/\r$//' .gitlab-ci.yml
