@@ -1,4 +1,3 @@
-cat << 'EOF' > .gitlab-ci.yml
 stages:
   - build
   - deploy
@@ -40,5 +39,3 @@ deploy_to_mon_server:
   script:
     - scp meocare/target/*.jar root@192.168.11.110:/opt/meocare/meocare.jar
     - ssh root@192.168.11.110 "pkill -f 'meocare.jar' || true; nohup java -Xms256m -Xmx512m -jar /opt/meocare/meocare.jar > /opt/meocare/app.log 2>&1 &"
-EOF
-sed -i 's/\t/  /g; s/\r$//' .gitlab-ci.yml
