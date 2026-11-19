@@ -30,6 +30,7 @@ deploy_to_mon_server:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   before_script:
+    - '[ -n "$SSH_PRIVATE_KEY" ] && echo "SSH_PRIVATE_KEY co gia tri" || echo "SSH_PRIVATE_KEY RONG"'
     - apk add --no-cache openssh-client
     - eval $(ssh-agent -s)
     - chmod 600 "$SSH_PRIVATE_KEY"
