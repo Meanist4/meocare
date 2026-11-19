@@ -1,0 +1,58 @@
+@baseUrl = http://192.168.11.110:8080
+# Chọn ID pet có thật và user bác sĩ đang ACTIVE từ hai request setup bên dưới.
+@petId = 1
+@veterinarianId = 1
+
+### Setup: liệt kê thú cưng để chọn petId hợp lệ
+GET {{baseUrl}}/api/pets
+
+### Setup: liệt kê user để chọn veterinarianId có role VETERINARIAN và status ACTIVE
+GET {{baseUrl}}/api/users
+
+### 1. Tạo lịch hẹn mới (201)
+# Các thời điểm dưới đây cố ý đặt xa trong tương lai để qua kiểm tra @Future.
+# @name createAppointment
+POST {{baseUrl}}/api/appointments
+Content-Type: application/json
+
+{
+  "petId": {{petId}},
+  "veterinarianId": {{veterinarianId}},
+  "requestedStart": "2099-06-15T09:00:00",
+  "requestedEnd": "2099-06-15T09:30:00",
+  "symptoms": "Smoke test appointment",
+  "imageUrls": []
+}
+
+### 2. Liệt kê lịch hẹn của bác sĩ vừa chọn (200)
+GET {{baseUrl}}/api/appointments?veterinarianId={{veterinarianId}}
+
+### 3. Lấy chi tiết lịch hẹn vừa tạo (200; trạng thái ban đầu PENDING)
+GET {{baseUrl}}/api/appointments/{{createAppointment.response.body.$.id}}
+
+### 4. Tạo đề xuất đổi lịch (201; bác sĩ là người đề xuất)
+# @name createProposal
+POST {{baseUrl}}/api/appointment-proposals
+Content-Type: application/json
+
+{
+  "appointmentId": {{createAppointment.response.body.$.id}},
+  "proposedById": {{veterinarianId}},
+  "proposedStart": "2099-06-16T10:00:00",
+  "proposedEnd": "2099-06-16T10:30:00",
+  "note": "Smoke test reschedule proposal"
+}
+
+### 5. Liệt kê proposal của lịch hẹn (200; proposal vừa tạo có trạng thái PENDING)
+GET {{baseUrl}}/api/appointment-proposals/appointment/{{createAppointment.response.body.$.id}}
+
+### 6. Chấp nhận proposal (200; proposal chuyển sang ACCEPTED)
+# @name acceptProposal
+PATCH {{baseUrl}}/api/appointment-proposals/{{createProposal.response.body.$.id}}/accept
+
+### 7. Kiểm tra lịch hẹn sau khi accept (200; CONFIRMED và confirmedStart/End theo đề xuất)
+GET {{baseUrl}}/api/appointments/{{createAppointment.response.body.$.id}}
+
+### 8. Case lỗi: lấy lịch hẹn không tồn tại (404; body theo ApiErrorResponse)
+# Kỳ vọng: status=404, error="Not Found", message/path được điền, fieldErrors=null.
+GET {{baseUrl}}/api/appointments/9223372036854775807

@@ -1,0 +1,105 @@
+@baseUrl = http://192.168.11.110:8080
+@newEmail = meocare.api.{{$timestamp}}@example.com
+@password = MeocareSmoke123!
+
+# Error response fields: timestamp, status, error, message, path, fieldErrors.
+# Duplicate email currently returns 400 with fieldErrors=null; validation returns 400 with fieldErrors populated.
+
+### 1. Register a new CUSTOMER (201; response must not contain "password")
+# @name registerCustomer
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Meocare API Smoke Test",
+  "email": "{{newEmail}}",
+  "password": "{{password}}",
+  "phone": "0900000000"
+}
+
+### 2. Register the same email again (currently 400, not 409)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Duplicate Smoke Test",
+  "email": "{{registerCustomer.response.body.$.email}}",
+  "password": "{{password}}"
+}
+
+### 3. Missing required registration fields (400 with fieldErrors)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Missing Fields Smoke Test"
+}
+
+### 4. Login with the account created above (200; token is currently null)
+# @name loginCustomer
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{registerCustomer.response.body.$.email}}",
+  "password": "{{password}}"
+}
+
+### 5. Create a pet owned by the new user (201)
+# @name createPet
+POST {{baseUrl}}/api/pets?ownerId={{registerCustomer.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "name": "Smoke Test Pet",
+  "species": "Dog",
+  "breed": "Mixed",
+  "gender": "UNKNOWN",
+  "dateOfBirth": "2020-01-01",
+  "weight": 5.25,
+  "description": "Temporary API smoke-test record"
+}
+
+### 6. List pets belonging to the new user (200)
+GET {{baseUrl}}/api/pets?ownerId={{registerCustomer.response.body.$.id}}
+
+### 7. Get the created pet (200)
+GET {{baseUrl}}/api/pets/{{createPet.response.body.$.id}}
+
+### 8. Update the created pet (200)
+PUT {{baseUrl}}/api/pets/{{createPet.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "name": "Smoke Test Pet Updated",
+  "species": "Dog",
+  "breed": "Mixed",
+  "gender": "UNKNOWN",
+  "dateOfBirth": "2020-01-01",
+  "weight": 5.5,
+  "description": "Updated temporary API smoke-test record"
+}
+
+### 9. Add a pet image URL (201)
+# @name addPetImage
+POST {{baseUrl}}/api/pets/{{createPet.response.body.$.id}}/images
+Content-Type: application/json
+
+{
+  "imageUrl": "https://example.com/meocare-smoke-test-pet.jpg"
+}
+
+### 10. List images for the pet (200)
+GET {{baseUrl}}/api/pets/{{createPet.response.body.$.id}}/images
+
+### 11. Delete the temporary pet (204)
+DELETE {{baseUrl}}/api/pets/{{createPet.response.body.$.id}}
+
+### 12. Verify the deleted pet returns the standard 404 response
+GET {{baseUrl}}/api/pets/{{createPet.response.body.$.id}}
+
+### BCrypt verification (run separately in MySQL; use the email from registerCustomer)
+# SELECT id, email, LEFT(password, 4) AS hash_prefix, LENGTH(password) = 60 AS bcrypt_length_ok
+# FROM users
+# WHERE email = '<email from the registration response>';
+# Expected: hash_prefix is $2a$, $2b$, or $2y$; bcrypt_length_ok is 1.
