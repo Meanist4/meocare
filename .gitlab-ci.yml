@@ -1,3 +1,4 @@
+cat << 'EOF' > .gitlab-ci.yml
 stages:
   - build
   - deploy
@@ -16,9 +17,9 @@ build_and_test:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /^feature\/.*/ || $CI_COMMIT_BRANCH =~ /^ci\/.*/
   script:
+    - apt-get update && apt-get install -y --no-install-recommends maven
     - cd meocare
-    - chmod +x mvnw
-    - ./mvnw clean package -DskipTests
+    - mvn clean package -DskipTests
   artifacts:
     paths:
       - meocare/target/*.jar
@@ -27,8 +28,6 @@ build_and_test:
 deploy_to_mon_server:
   stage: deploy
   image: alpine:latest
-  needs:
-    - build_and_test
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   before_script:
@@ -41,3 +40,4 @@ deploy_to_mon_server:
   script:
     - scp meocare/target/*.jar root@192.168.11.110:/opt/meocare/meocare.jar
     - ssh root@192.168.11.110 "pkill -f 'meocare.jar' || true; nohup java -Xms256m -Xmx512m -jar /opt/meocare/meocare.jar > /opt/meocare/app.log 2>&1 &"
+EOF
