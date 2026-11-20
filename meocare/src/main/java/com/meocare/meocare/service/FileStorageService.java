@@ -37,9 +37,10 @@ public class FileStorageService {
     private final long maxFileSizeBytes;
 
     public FileStorageService(
-            @Value("${app.upload.dir:uploads}") String uploadDir,
+            @Value("${app.upload.dir:./uploads}") String uploadDir,
             @Value("${app.upload.max-file-size-bytes:10485760}") long maxFileSizeBytes) {
-        this.uploadRoot = Paths.get(uploadDir).toAbsolutePath().normalize();
+        String configured = (uploadDir == null || uploadDir.isBlank()) ? "./uploads" : uploadDir.trim();
+        this.uploadRoot = Paths.get(configured).toAbsolutePath().normalize();
         this.maxFileSizeBytes = maxFileSizeBytes;
     }
 
