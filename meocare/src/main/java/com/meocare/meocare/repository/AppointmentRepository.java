@@ -27,7 +27,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Optional<Appointment> findByIdAndVeterinarian_Id(Long id, Long veterinarianId);
 
-    /** Nạp sẵn pet, customer, veterinarian cho màn hình chi tiết. */
     @Query("""
             select a from Appointment a
             join fetch a.pet
@@ -37,10 +36,34 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             """)
     Optional<Appointment> findDetailById(@Param("id") Long id);
 
-    /**
-     * Kiểm tra bác sĩ bị trùng lịch (chỉ xét lịch có trạng thái {@code status}, thường là CONFIRMED).
-     * {@code excludeId}: id lịch cần bỏ qua khi cập nhật; truyền 0L nếu không có.
-     */
+    @Query("""
+            select a from Appointment a
+            join fetch a.pet
+            join fetch a.customer
+            left join fetch a.veterinarian
+            where (:customerId is null or a.customer.id = :customerId)
+              and (:veterinarianId is null or a.veterinarian.id = :veterinarianId)
+              and (:status is null or a.status = :status)
+            order by a.createdAt desc
+            """)
+    List<Appointment> findFiltered(@Param("customerId") Long customerId,
+                                   @Param("veterinarianId") Long veterinarianId,
+                                   @Param("status") AppointmentStatus status);
+
+    @Query("""
+            select a from Appointment a
+            join fetch a.pet
+            join fetch a.customer
+            left join fetch a.veterinarian
+            where (a.veterinarian.id = :veterinarianId or a.veterinarian is null)
+              and (:customerId is null or a.customer.id = :customerId)
+              and (:status is null or a.status = :status)
+            order by a.createdAt desc
+            """)
+    List<Appointment> findForVeterinarianQueue(@Param("veterinarianId") Long veterinarianId,
+                                               @Param("customerId") Long customerId,
+                                               @Param("status") AppointmentStatus status);
+
     @Query("""
             select count(a) > 0 from Appointment a
             where a.veterinarian.id = :veterinarianId
@@ -55,7 +78,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                        @Param("end") LocalDateTime end,
                                        @Param("excludeId") Long excludeId);
 
-    /** Lịch của bác sĩ trong một khoảng thời gian (xem lịch ngày/tuần). */
     @Query("""
             select a from Appointment a
             where a.veterinarian.id = :veterinarianId

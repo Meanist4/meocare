@@ -3,10 +3,10 @@ package com.meocare.meocare.dto;
 import com.meocare.meocare.entity.Appointment;
 import com.meocare.meocare.entity.enums.AppointmentStatus;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * Lưu ý: {@link #from(Appointment)} đọc tên pet/customer/veterinarian (LAZY).
- * Hãy nạp bằng AppointmentRepository.findDetailById hoặc gọi trong transaction.
+ * Appointment summary/detail DTO including attached symptom images.
  */
 public record AppointmentResponse(
         Long id,
@@ -22,10 +22,15 @@ public record AppointmentResponse(
         LocalDateTime confirmedEnd,
         String symptoms,
         AppointmentStatus status,
+        List<AppointmentImageResponse> images,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static AppointmentResponse from(Appointment a) {
+        return from(a, List.of());
+    }
+
+    public static AppointmentResponse from(Appointment a, List<AppointmentImageResponse> images) {
         return new AppointmentResponse(
                 a.getId(),
                 a.getPet() != null ? a.getPet().getId() : null,
@@ -40,6 +45,7 @@ public record AppointmentResponse(
                 a.getConfirmedEnd(),
                 a.getSymptoms(),
                 a.getStatus(),
+                images != null ? images : List.of(),
                 a.getCreatedAt(),
                 a.getUpdatedAt()
         );

@@ -17,6 +17,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -35,6 +36,18 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler({ConflictException.class, IllegalStateException.class})
+    public ResponseEntity<ApiErrorResponse> handleConflict(
+            RuntimeException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiErrorResponse> handleMaxUploadSize(
+            MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, "Uploaded file exceeds the maximum allowed size", request, null);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -43,7 +56,7 @@ public class GlobalExceptionHandler {
                 .forEach(fe -> errors.putIfAbsent(fe.getField(), fe.getDefaultMessage()));
         ex.getBindingResult().getGlobalErrors()
                 .forEach(ge -> errors.putIfAbsent(ge.getObjectName(), ge.getDefaultMessage()));
-        return build(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ", request, errors);
+        return build(HttpStatus.BAD_REQUEST, "Validation failed", request, errors);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -52,40 +65,45 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new LinkedHashMap<>();
         ex.getConstraintViolations()
                 .forEach(v -> errors.putIfAbsent(v.getPropertyPath().toString(), v.getMessage()));
-        return build(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ", request, errors);
+        return build(HttpStatus.BAD_REQUEST, "Validation failed", request, errors);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleUnreadable(
             HttpMessageNotReadableException ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST,
-                "Body request sai định dạng JSON hoặc có giá trị không hợp lệ (ví dụ sai enum, sai kiểu ngày giờ)",
+                "Malformed JSON request body or invalid field value",
                 request, null);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiErrorResponse> handleAuthentication(
             AuthenticationException ex, HttpServletRequest request) {
-        return build(HttpStatus.UNAUTHORIZED, "Xác thực không thành công", request, null);
+        String message = ex.getMessage() != null && !ex.getMessage().isBlank()
+                ? ex.getMessage()
+                : "Authentication failed";
+        return build(HttpStatus.UNAUTHORIZED, message, request, null);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(
             AccessDeniedException ex, HttpServletRequest request) {
-        return build(HttpStatus.FORBIDDEN, "Bạn không có quyền thực hiện thao tác này", request, null);
+        String message = ex.getMessage() != null && !ex.getMessage().isBlank()
+                ? ex.getMessage()
+                : "You do not have permission to perform this action";
+        return build(HttpStatus.FORBIDDEN, message, request, null);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneric(
             Exception ex, HttpServletRequest request) {
-        // Các lỗi web chuẩn của Spring (405, 415, 404 resource...) đã mang sẵn status đúng.
         if (ex instanceof ErrorResponse springError) {
             String detail = springError.getBody().getDetail();
             return build(springError.getStatusCode(),
-                    detail != null ? detail : "Yêu cầu không hợp lệ", request, null);
+                    detail != null ? detail : "Invalid request", request, null);
         }
         log.error("Unhandled exception at {}", request.getRequestURI(), ex);
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Đã xảy ra lỗi hệ thống", request, null);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected server error occurred", request, null);
     }
 
     private ResponseEntity<ApiErrorResponse> build(

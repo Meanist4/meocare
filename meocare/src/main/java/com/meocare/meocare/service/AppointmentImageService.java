@@ -1,58 +1,79 @@
 package com.meocare.meocare.service;
 
+import com.meocare.meocare.dto.AppointmentImageResponse;
 import com.meocare.meocare.entity.Appointment;
 import com.meocare.meocare.entity.AppointmentImage;
+import com.meocare.meocare.entity.enums.RoleName;
 import com.meocare.meocare.exception.ResourceNotFoundException;
 import com.meocare.meocare.repository.AppointmentImageRepository;
 import com.meocare.meocare.repository.AppointmentRepository;
+import com.meocare.meocare.security.CustomUserDetails;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-/**
- * PHẦN TUỲ CHỌN: chỉ giữ nếu dự án đã có entity AppointmentImage + AppointmentImageRepository.
- * ImageRequest/ImageResponse đặt lồng ở đây để không trùng tên với DTO sẵn có của bạn;
- * nếu đã có DTO riêng thì thay vào.
- */
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AppointmentImageService {
 
-    public record ImageRequest(@NotBlank String imageUrl) {
-    }
-
-    public record ImageResponse(Long id, Long appointmentId, String imageUrl) {
+    public record ImageRequest(
+            @NotBlank(message = "imageUrl is required")
+            @Size(max = 500, message = "imageUrl must be at most 500 characters")
+            String imageUrl
+    ) {
     }
 
     private final AppointmentImageRepository imageRepository;
     private final AppointmentRepository appointmentRepository;
+    private final AppointmentService appointmentService;
 
     @Transactional
-    public ImageResponse addImage(Long appointmentId, ImageRequest request) {
-        Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy lịch hẹn với id " + appointmentId));
+    public AppointmentImageResponse addImage(Long appointmentId, ImageRequest request, CustomUserDetails principal) {
+        Appointment appointment = appointmentRepository.findDetailById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", appointmentId));
+        assertWriteAccess(appointment, principal);
 
         AppointmentImage image = new AppointmentImage();
         image.setAppointment(appointment);
-        image.setImageUrl(request.imageUrl()); // GIẢ ĐỊNH: tên trường URL ảnh
-        return toResponse(imageRepository.save(image), appointmentId);
+        image.setImageUrl(request.imageUrl().trim());
+        return AppointmentImageResponse.from(imageRepository.save(image));
     }
 
-    @Transactional(readOnly = true)
-    public List<ImageResponse> getImages(Long appointmentId) {
-        if (!appointmentRepository.existsById(appointmentId)) {
-            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn với id " + appointmentId);
-        }
-        return imageRepository.findByAppointment_Id(appointmentId).stream()
-                .map(i -> toResponse(i, appointmentId))
+    public List<AppointmentImageResponse> getImages(Long appointmentId, CustomUserDetails principal) {
+        Appointment appointment = appointmentRepository.findDetailById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", appointmentId));
+        appointmentService.assertViewAccess(appointment, principal);
+
+        return imageRepository.findByAppointment_IdOrderByCreatedAtDesc(appointmentId).stream()
+                .map(AppointmentImageResponse::from)
                 .toList();
     }
 
-    private ImageResponse toResponse(AppointmentImage i, Long appointmentId) {
-        return new ImageResponse(i.getId(), appointmentId, i.getImageUrl());
+    @Transactional
+    public void deleteImage(Long appointmentId, Long imageId, CustomUserDetails principal) {
+        Appointment appointment = appointmentRepository.findDetailById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", appointmentId));
+        assertWriteAccess(appointment, principal);
+
+        AppointmentImage image = imageRepository.findByIdAndAppointment_Id(imageId, appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment image", imageId));
+        imageRepository.delete(image);
+    }
+
+    private void assertWriteAccess(Appointment appointment, CustomUserDetails principal) {
+        if (principal.getRole() == RoleName.ADMIN) {
+            return;
+        }
+        if (principal.getRole() == RoleName.CUSTOMER
+                && appointment.getCustomer() != null
+                && appointment.getCustomer().getId().equals(principal.getId())) {
+            return;
+        }
+        throw new AccessDeniedException("You do not have permission to modify images for this appointment");
     }
 }

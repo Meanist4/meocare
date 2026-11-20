@@ -6,26 +6,27 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-/** appointmentId lấy từ path, proposedBy lấy từ người dùng đang đăng nhập. */
+/**
+ * Reschedule proposal payload.
+ * proposedBy is always derived from the authenticated JWT principal.
+ * appointmentId is required for POST /api/appointment-proposals and optional when supplied via path
+ * in POST /api/appointments/{appointmentId}/proposals.
+ */
 public record ProposalRequest(
-        @NotNull(message = "appointmentId không được để trống")
         Long appointmentId,
 
-        @NotNull(message = "proposedById không được để trống")
-        Long proposedById,
-
-        @NotNull(message = "Thời gian bắt đầu đề xuất không được để trống")
-        @Future(message = "Thời gian bắt đầu đề xuất phải ở tương lai")
+        @NotNull(message = "Proposed start time is required")
+        @Future(message = "Proposed start time must be in the future")
         LocalDateTime proposedStart,
 
-        @NotNull(message = "Thời gian kết thúc đề xuất không được để trống")
-        @Future(message = "Thời gian kết thúc đề xuất phải ở tương lai")
+        @NotNull(message = "Proposed end time is required")
+        @Future(message = "Proposed end time must be in the future")
         LocalDateTime proposedEnd,
 
-        @Size(max = 500, message = "Ghi chú tối đa 500 ký tự")
+        @Size(max = 500, message = "Note must be at most 500 characters")
         String note
 ) {
-    @AssertTrue(message = "Thời gian kết thúc đề xuất phải sau thời gian bắt đầu")
+    @AssertTrue(message = "Proposed end time must be after proposed start time")
     public boolean isProposedTimeRangeValid() {
         return proposedStart == null || proposedEnd == null || proposedEnd.isAfter(proposedStart);
     }

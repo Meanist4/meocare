@@ -14,13 +14,28 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    /** Dùng cho login/profile: nạp luôn role để tránh LazyInitializationException. */
+    boolean existsByRole_Name(RoleName roleName);
+
+    /** Eagerly fetch role for login/profile to avoid LazyInitializationException. */
     @EntityGraph(attributePaths = "role")
     Optional<User> findWithRoleByEmail(String email);
 
     @EntityGraph(attributePaths = "role")
     Optional<User> findWithRoleById(Long id);
 
-    /** Ví dụ: danh sách bác sĩ đang hoạt động. */
+    @EntityGraph(attributePaths = "role")
+    List<User> findAllByOrderByCreatedAtDesc();
+
+    @EntityGraph(attributePaths = "role")
+    List<User> findByRole_NameOrderByCreatedAtDesc(RoleName roleName);
+
+    @EntityGraph(attributePaths = "role")
+    List<User> findByStatusOrderByCreatedAtDesc(UserStatus status);
+
+    @EntityGraph(attributePaths = "role")
+    List<User> findByRole_NameAndStatusOrderByCreatedAtDesc(RoleName roleName, UserStatus status);
+
+    /** Active users by role (e.g., active veterinarians). */
+    @EntityGraph(attributePaths = "role")
     List<User> findByRole_NameAndStatus(RoleName roleName, UserStatus status);
 }

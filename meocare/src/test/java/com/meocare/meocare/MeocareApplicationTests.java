@@ -1,38 +1,30 @@
 package com.meocare.meocare;
 
-import com.meocare.meocare.repository.AppointmentRepository;
-import com.meocare.meocare.repository.MedicalRecordRepository;
-import com.meocare.meocare.repository.PetImageRepository;
-import com.meocare.meocare.repository.PetRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.meocare.meocare.entity.enums.RoleName;
 import com.meocare.meocare.repository.RoleRepository;
 import com.meocare.meocare.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class MeocareApplicationTests {
 
-    @MockitoBean
-    private UserRepository userRepository;
-
-    @MockitoBean
+    @Autowired
     private RoleRepository roleRepository;
 
-    @MockitoBean
-    private PetRepository petRepository;
-
-    @MockitoBean
-    private PetImageRepository petImageRepository;
-
-    @MockitoBean
-    private AppointmentRepository appointmentRepository;
-
-    @MockitoBean
-    private MedicalRecordRepository medicalRecordRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
-    void contextLoads() {
+    void contextLoadsAndSeedsRolesAndAdmin() {
+        assertThat(roleRepository.existsByName(RoleName.ADMIN)).isTrue();
+        assertThat(roleRepository.existsByName(RoleName.VETERINARIAN)).isTrue();
+        assertThat(roleRepository.existsByName(RoleName.CUSTOMER)).isTrue();
+        assertThat(userRepository.existsByRole_Name(RoleName.ADMIN)).isTrue();
     }
-
 }

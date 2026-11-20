@@ -3,8 +3,8 @@ package com.meocare.meocare.dto;
 import com.meocare.meocare.entity.MedicalRecord;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
-/** {@link #from(MedicalRecord)} đọc pet/veterinarian (LAZY): dùng MedicalRecordRepository.findDetailById hoặc transaction. */
 public record MedicalRecordResponse(
         Long id,
         Long appointmentId,
@@ -19,10 +19,15 @@ public record MedicalRecordResponse(
         String treatment,
         String advice,
         String notes,
+        List<MedicalRecordImageResponse> images,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static MedicalRecordResponse from(MedicalRecord m) {
+        return from(m, List.of());
+    }
+
+    public static MedicalRecordResponse from(MedicalRecord m, List<MedicalRecordImageResponse> images) {
         return new MedicalRecordResponse(
                 m.getId(),
                 m.getAppointment() != null ? m.getAppointment().getId() : null,
@@ -37,6 +42,7 @@ public record MedicalRecordResponse(
                 m.getTreatment(),
                 m.getAdvice(),
                 m.getNotes(),
+                images != null ? images : List.of(),
                 m.getCreatedAt(),
                 m.getUpdatedAt()
         );
