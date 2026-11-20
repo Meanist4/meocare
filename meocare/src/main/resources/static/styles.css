@@ -1,0 +1,263 @@
+:root {
+  color-scheme: light;
+  --ink: #253633;
+  --muted: #82908a;
+  --green: #357c68;
+  --green-dark: #286653;
+  --green-soft: #e8f3ed;
+  --line: #e9eee9;
+  --paper: #fff;
+  --canvas: #f7f8f4;
+  --peach: #fff0e8;
+  --shadow: 0 14px 40px rgba(39, 67, 55, .055);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.app-shell { min-height: 100vh; }
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 2;
+  display: flex;
+  width: 248px;
+  flex-direction: column;
+  padding: 31px 20px 20px;
+  background: #fff;
+  border-right: 1px solid #edf0eb;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  color: var(--ink);
+  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--green);
+  color: #fff;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.brand-period { color: #e7a37f; }
+.sidebar-label { margin: 54px 0 13px 10px; color: #a4aea8; font-size: 9px; font-weight: 700; letter-spacing: 1.15px; }
+.main-nav { display: grid; gap: 6px; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #77847e;
+  text-align: left;
+  transition: background .18s ease, color .18s ease;
+}
+
+.nav-link:hover { background: #f6f8f5; color: var(--green-dark); }
+.nav-link.is-active { background: var(--green-soft); color: var(--green-dark); font-weight: 700; }
+.nav-icon { display: grid; width: 22px; place-items: center; font-size: 19px; line-height: 1; }
+
+.sidebar-note {
+  position: relative;
+  margin-top: auto;
+  padding: 20px 18px 17px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f5f7ef;
+}
+
+.note-icon { color: #dcaa73; font-size: 17px; }
+.sidebar-note p { max-width: 165px; margin: 12px 0 15px; color: #586860; font-family: "Nunito", sans-serif; font-size: 13px; font-weight: 700; line-height: 1.6; }
+.note-credit { color: #9ba59e; font-size: 10px; }
+.sidebar-footer { display: flex; align-items: center; gap: 8px; padding: 20px 4px 0; color: #94a099; font-size: 10px; }
+.online-dot { width: 7px; height: 7px; border-radius: 50%; background: #6bb68c; box-shadow: 0 0 0 3px #e9f4ec; }
+
+.main-content { max-width: 1600px; min-height: 100vh; margin-left: 248px; padding: 0 46px 54px; }
+.topbar { display: flex; height: 76px; align-items: center; justify-content: space-between; border-bottom: 1px solid #e9eee9; }
+.breadcrumb { display: flex; gap: 11px; color: #a1aaa4; font-size: 12px; }
+.breadcrumb-current { color: var(--ink); }
+.breadcrumb-separator { color: #c5ccc7; }
+.topbar-badge { display: flex; align-items: center; gap: 8px; padding: 9px 13px; border: 1px solid #edf0eb; border-radius: 20px; background: #fff; color: #6f7e75; font-size: 11px; }
+.topbar-badge span { color: #d79a72; font-size: 14px; }
+
+.view { display: none; }
+.view.is-visible { display: block; }
+.page-heading { position: relative; display: flex; min-height: 183px; align-items: center; justify-content: space-between; padding: 28px 8px 24px; }
+.eyebrow { margin: 0 0 9px; color: #8ca094; font-size: 9px; font-weight: 700; letter-spacing: 1.15px; }
+h1, h2, p { margin-top: 0; }
+h1 { margin-bottom: 8px; font-family: "Nunito", "Segoe UI", sans-serif; font-size: clamp(26px, 3vw, 35px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.2; }
+h1 span { color: var(--green); }
+.page-intro { margin: 0; color: #88948d; font-size: 12px; }
+.heading-illustration { position: relative; display: grid; width: 105px; height: 105px; margin-right: 37px; place-items: center; border-radius: 50%; background: #f0eee3; color: #9caa78; font-size: 48px; }
+.heading-illustration::before, .heading-illustration::after { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #edb997; content: ""; opacity: .7; }
+.heading-illustration::before { top: 8px; right: 2px; }
+.heading-illustration::after { bottom: 1px; left: 1px; width: 12px; height: 12px; background: #9bb9a3; }
+.illustration-spark { position: absolute; top: -9px; right: -24px; color: #d6aa73; font-size: 18px; }
+.record-illustration { background: #f4e9e3; color: #d39172; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin-bottom: 20px; }
+.stat-card { display: flex; min-height: 93px; align-items: center; gap: 13px; padding: 17px 18px; border: 1px solid #edf0eb; border-radius: 13px; background: #fff; box-shadow: 0 6px 20px rgba(39, 67, 55, .025); }
+.stat-icon { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border-radius: 12px; font-size: 20px; }
+.stat-icon.mint { background: #eaf3ec; color: #56896d; }
+.stat-icon.peach { background: #fff0e8; color: #d39172; }
+.stat-icon.lilac { background: #f0edf8; color: #8475af; }
+.stat-card p { margin: 0 0 4px; color: #89958e; font-size: 10px; }
+.stat-card strong { font-family: "Nunito", sans-serif; font-size: 21px; font-weight: 800; }
+.stat-caption { margin: 22px 0 0 auto; color: #adb6b0; font-size: 9px; white-space: nowrap; }
+
+.content-grid { display: grid; grid-template-columns: minmax(310px, .82fr) minmax(390px, 1.18fr); align-items: start; gap: 17px; }
+.panel { border: 1px solid #edf0eb; border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
+.booking-panel { padding: 23px 23px 22px; }
+.appointments-panel { min-height: 445px; padding: 23px 23px 12px; }
+.panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.panel-heading .eyebrow { margin-bottom: 6px; }
+h2 { margin: 0; font-family: "Nunito", "Segoe UI", sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -.3px; }
+.panel-heading-icon { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 10px; background: var(--green-soft); color: var(--green); font-size: 20px; }
+
+.field-label { display: block; margin: 0 0 7px; color: #52635a; font-size: 11px; font-weight: 700; }
+.required { color: #df896c; }
+.optional { color: #a7b0aa; font-size: 10px; font-weight: 400; }
+input, select, textarea { width: 100%; border: 1px solid #e7ece7; border-radius: 8px; outline: none; background: #fff; color: #394941; transition: border-color .16s ease, box-shadow .16s ease; }
+input, select { min-height: 41px; padding: 0 11px; }
+textarea { min-height: 80px; padding: 11px; resize: vertical; }
+input::placeholder, textarea::placeholder { color: #b7c0ba; }
+input:focus, select:focus, textarea:focus { border-color: #87b29b; box-shadow: 0 0 0 3px rgba(91, 150, 117, .11); }
+#appointment-form > select, #appointment-form > textarea { margin-bottom: 17px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 17px; }
+.field-row input { padding: 0 8px; font-size: 10px; }
+.form-hint { margin: -7px 0 16px; color: #9aa49e; font-size: 10px; line-height: 1.5; }
+.primary-button { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: center; gap: 14px; border: 0; border-radius: 9px; background: var(--green); color: #fff; font-size: 12px; font-weight: 700; transition: background .16s ease, transform .16s ease; }
+.primary-button:hover { transform: translateY(-1px); background: var(--green-dark); }
+.primary-button:disabled { cursor: wait; opacity: .7; transform: none; }
+
+.list-heading { align-items: center; margin-bottom: 13px; }
+.compact-select { width: auto; min-width: 115px; min-height: 34px; padding: 0 27px 0 10px; color: #68786f; font-size: 10px; }
+.appointment-list { border-top: 1px solid #f0f2ee; }
+.appointment-card { display: flex; align-items: center; gap: 12px; padding: 15px 1px; border-bottom: 1px solid #f0f2ee; }
+.pet-avatar { display: grid; width: 43px; height: 43px; flex: 0 0 43px; place-items: center; border-radius: 13px; background: #f9eee6; font-size: 20px; }
+.appointment-detail { min-width: 0; flex: 1; }
+.appointment-name { overflow: hidden; margin: 0 0 4px; color: #394941; font-family: "Nunito", sans-serif; font-size: 13px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.appointment-meta { margin: 0; color: #929e96; font-size: 10px; line-height: 1.55; }
+.appointment-meta span + span::before { margin: 0 5px; color: #c2cac4; content: "·"; }
+.appointment-side { display: grid; justify-items: end; gap: 7px; }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.status-pill::before { width: 5px; height: 5px; border-radius: 50%; background: currentColor; content: ""; }
+.status-pending, .status-reschedule_proposed { background: #fff4e5; color: #c18b3f; }
+.status-confirmed { background: #eaf4ed; color: #55876a; }
+.status-completed { background: #eef0f6; color: #7d83a4; }
+.status-cancelled, .status-rejected { background: #fbeeed; color: #be7770; }
+.appointment-date { color: #89958e; font-size: 9px; white-space: nowrap; }
+
+.records-heading { min-height: 185px; }
+.records-panel { min-height: 280px; padding: 23px; }
+.records-list-heading { align-items: center; padding-bottom: 18px; border-bottom: 1px solid #f0f2ee; }
+.record-pet-control { width: 190px; }
+.record-pet-control .field-label { margin-bottom: 6px; }
+.record-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; padding-top: 17px; }
+.record-card { padding: 18px; border: 1px solid #edf0eb; border-radius: 11px; background: #fdfefd; }
+.record-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+.record-pet-name { margin: 0 0 4px; font-family: "Nunito", sans-serif; font-size: 15px; font-weight: 800; }
+.record-date { color: #98a39c; font-size: 10px; }
+.record-weight { padding: 6px 9px; border-radius: 7px; background: #eef5ef; color: #578269; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.record-section { padding-top: 12px; border-top: 1px solid #f0f2ee; }
+.record-section + .record-section { margin-top: 11px; }
+.record-section h3 { margin: 0 0 5px; color: #8b9b90; font-size: 9px; letter-spacing: .45px; text-transform: uppercase; }
+.record-section p { margin: 0; color: #53635a; font-size: 11px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.record-vitals { display: flex; gap: 14px; margin-top: 11px; color: #8c9991; font-size: 10px; }
+.record-vitals strong { color: #55655c; }
+
+.loading-state, .empty-state { display: flex; min-height: 145px; align-items: center; justify-content: center; gap: 10px; padding: 20px; color: #9aa69e; font-size: 11px; text-align: center; }
+.empty-state { display: block; padding-top: 48px; line-height: 1.7; }
+.empty-icon { display: block; margin-bottom: 9px; color: #d3a27c; font-size: 25px; }
+.loader { width: 15px; height: 15px; border: 2px solid #e6eee8; border-top-color: var(--green); border-radius: 50%; animation: spin .75s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.toast { position: fixed; right: 24px; bottom: 24px; z-index: 4; max-width: min(420px, calc(100vw - 32px)); padding: 13px 17px; border: 1px solid #dfeae1; border-radius: 10px; background: #fff; box-shadow: 0 10px 32px rgba(39, 67, 55, .14); color: #4a6253; font-size: 12px; line-height: 1.5; }
+.toast.is-error { border-color: #f0d7d1; color: #a75043; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+[hidden] { display: none !important; }
+
+@media (max-width: 1100px) {
+  .sidebar { width: 210px; padding-right: 15px; padding-left: 15px; }
+  .main-content { margin-left: 210px; padding-right: 28px; padding-left: 28px; }
+  .content-grid { grid-template-columns: minmax(280px, .9fr) minmax(340px, 1.1fr); gap: 12px; }
+  .stat-card { gap: 9px; padding-right: 11px; padding-left: 11px; }
+  .stat-caption { display: none; }
+  .booking-panel, .appointments-panel { padding-right: 17px; padding-left: 17px; }
+}
+
+@media (max-width: 790px) {
+  .sidebar { position: sticky; inset: 0 0 auto; width: auto; height: auto; flex-direction: row; align-items: center; justify-content: space-between; padding: 11px 18px; border-right: 0; border-bottom: 1px solid #edf0eb; }
+  .brand { gap: 7px; font-size: 21px; }
+  .brand-mark { width: 30px; height: 30px; border-radius: 10px; font-size: 21px; }
+  .sidebar-label, .sidebar-note, .sidebar-footer { display: none; }
+  .main-nav { display: flex; gap: 5px; }
+  .nav-link { min-height: 39px; gap: 7px; padding: 0 10px; font-size: 11px; }
+  .nav-icon { width: 16px; font-size: 16px; }
+  .main-content { min-height: calc(100vh - 57px); margin-left: 0; padding: 0 22px 36px; }
+  .topbar { height: 58px; }
+  .page-heading { min-height: 157px; }
+  .heading-illustration { width: 77px; height: 77px; margin-right: 12px; font-size: 37px; }
+  .content-grid { grid-template-columns: 1fr; }
+  .appointments-panel { min-height: 0; }
+  .record-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 500px) {
+  .sidebar { padding-right: 12px; padding-left: 12px; }
+  .nav-link { gap: 5px; padding: 0 8px; font-size: 10px; }
+  .nav-icon { display: none; }
+  .main-content { padding-right: 15px; padding-left: 15px; }
+  .topbar-badge { padding: 7px 9px; font-size: 9px; }
+  .page-heading { min-height: 143px; padding-right: 2px; padding-left: 2px; }
+  h1 { max-width: 280px; font-size: 27px; }
+  .page-intro { max-width: 290px; font-size: 11px; line-height: 1.5; }
+  .heading-illustration { width: 55px; height: 55px; flex: 0 0 55px; margin-right: 12px; font-size: 27px; }
+  .illustration-spark { right: -9px; font-size: 14px; }
+  .stats-grid { gap: 7px; }
+  .stat-card { min-height: 79px; flex-direction: column; align-items: flex-start; gap: 4px; padding: 9px; }
+  .stat-icon { width: 27px; height: 27px; flex-basis: 27px; border-radius: 8px; font-size: 14px; }
+  .stat-card p { font-size: 9px; }
+  .stat-card strong { font-size: 17px; }
+  .booking-panel, .appointments-panel, .records-panel { padding: 18px 14px; }
+  .field-row { grid-template-columns: 1fr; gap: 12px; }
+  .field-row input { font-size: 12px; }
+  .appointment-card { gap: 8px; }
+  .pet-avatar { width: 36px; height: 36px; flex-basis: 36px; font-size: 17px; }
+  .appointment-meta { font-size: 9px; }
+  .appointment-side { gap: 5px; }
+  .status-pill { padding: 4px 6px; font-size: 8px; }
+  .appointment-date { font-size: 8px; }
+  .records-list-heading { align-items: flex-start; flex-direction: column; }
+  .record-pet-control { width: 100%; }
+}

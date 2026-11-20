@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f2">
+  <title>Meocare | Chăm sóc thú cưng</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Meocare - Trang chủ">
+        <span class="brand-mark" aria-hidden="true">m</span>
+        <span>meocare<span class="brand-period">.</span></span>
+      </a>
+
+      <div class="sidebar-label">KHÔNG GIAN CỦA BẠN</div>
+      <nav class="main-nav" aria-label="Điều hướng chính">
+        <button class="nav-link is-active" type="button" data-view="appointments">
+          <span class="nav-icon" aria-hidden="true">▦</span>
+          <span>Lịch khám</span>
+        </button>
+        <button class="nav-link" type="button" data-view="records">
+          <span class="nav-icon" aria-hidden="true">♡</span>
+          <span>Hồ sơ y tế</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="note-icon" aria-hidden="true">✦</span>
+        <p>Mỗi chiếc đuôi khỏe mạnh bắt đầu từ một lần chăm sóc đúng lúc.</p>
+        <span class="note-credit">Meocare care guide</span>
+      </div>
+      <div class="sidebar-footer"><span class="online-dot"></span> Kết nối API qua máy chủ Meocare</div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Meocare</span><span class="breadcrumb-separator">/</span><span id="breadcrumb-current">Lịch khám</span></div>
+        <div class="topbar-badge"><span aria-hidden="true">✿</span> Chăm sóc tận tâm</div>
+      </header>
+
+      <section class="view is-visible" id="appointments-view" aria-labelledby="page-title">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">CHĂM SÓC SỨC KHỎE THÚ CƯNG</p>
+            <h1 id="page-title">Một ngày khỏe, <span>một ngày vui.</span></h1>
+            <p class="page-intro">Theo dõi lịch khám và đặt lịch mới cho người bạn nhỏ của bạn.</p>
+          </div>
+          <div class="heading-illustration" aria-hidden="true"><span>✿</span><span class="illustration-spark">✦</span></div>
+        </div>
+
+        <div class="stats-grid" aria-label="Tổng quan lịch khám">
+          <article class="stat-card">
+            <span class="stat-icon mint" aria-hidden="true">▦</span>
+            <div><p>Tổng lịch khám</p><strong id="stat-total">—</strong></div>
+            <span class="stat-caption">tất cả lịch</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon peach" aria-hidden="true">◷</span>
+            <div><p>Chờ xác nhận</p><strong id="stat-pending">—</strong></div>
+            <span class="stat-caption">đang chờ</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon lilac" aria-hidden="true">♡</span>
+            <div><p>Đã xác nhận</p><strong id="stat-confirmed">—</strong></div>
+            <span class="stat-caption">sẵn sàng đi khám</span>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel booking-panel" aria-labelledby="booking-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">ĐẶT LỊCH MỚI</p>
+                <h2 id="booking-title">Lên lịch thăm khám</h2>
+              </div>
+              <span class="panel-heading-icon" aria-hidden="true">＋</span>
+            </div>
+            <form id="appointment-form">
+              <label class="field-label" for="pet-select">Bé cưng <span class="required">*</span></label>
+              <select id="pet-select" name="petId" required>
+                <option value="">Đang tải danh sách...</option>
+              </select>
+
+              <label class="field-label" for="vet-select">Bác sĩ mong muốn <span class="optional">(không bắt buộc)</span></label>
+              <select id="vet-select" name="veterinarianId">
+                <option value="">Để phòng khám sắp xếp</option>
+              </select>
+
+              <div class="field-row">
+                <div>
+                  <label class="field-label" for="requested-start">Ngày và giờ bắt đầu <span class="required">*</span></label>
+                  <input id="requested-start" name="requestedStart" type="datetime-local" required>
+                </div>
+                <div>
+                  <label class="field-label" for="requested-end">Ngày và giờ kết thúc <span class="required">*</span></label>
+                  <input id="requested-end" name="requestedEnd" type="datetime-local" required>
+                </div>
+              </div>
+
+              <label class="field-label" for="symptoms">Bé đang gặp vấn đề gì?</label>
+              <textarea id="symptoms" name="symptoms" rows="3" maxlength="2000" placeholder="Ví dụ: biếng ăn, mệt mỏi, cần kiểm tra định kỳ..."></textarea>
+              <p class="form-hint">Chọn khung giờ mong muốn; phòng khám sẽ xác nhận lịch với bạn.</p>
+              <button class="primary-button" type="submit">
+                <span>Gửi yêu cầu đặt lịch</span><span aria-hidden="true">→</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="panel appointments-panel" aria-labelledby="appointments-title">
+            <div class="panel-heading list-heading">
+              <div>
+                <p class="eyebrow">CỦA BẠN</p>
+                <h2 id="appointments-title">Lịch khám gần đây</h2>
+              </div>
+              <label class="visually-hidden" for="appointment-filter">Lọc theo thú cưng</label>
+              <select class="compact-select" id="appointment-filter">
+                <option value="">Tất cả bé</option>
+              </select>
+            </div>
+            <div class="appointment-list" id="appointment-list" aria-live="polite">
+              <div class="loading-state"><span class="loader"></span> Đang tải lịch khám...</div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="records-view" aria-labelledby="records-title" hidden>
+        <div class="page-heading records-heading">
+          <div>
+            <p class="eyebrow">HÀNH TRÌNH SỨC KHỎE</p>
+            <h1 id="records-title">Hồ sơ y tế <span>của bé.</span></h1>
+            <p class="page-intro">Những lần thăm khám và ghi chú chăm sóc được lưu lại tại đây.</p>
+          </div>
+          <div class="heading-illustration record-illustration" aria-hidden="true"><span>♡</span><span class="illustration-spark">✦</span></div>
+        </div>
+        <section class="panel records-panel" aria-labelledby="records-list-title">
+          <div class="panel-heading records-list-heading">
+            <div>
+              <p class="eyebrow">HỒ SƠ ĐÃ LƯU</p>
+              <h2 id="records-list-title">Lịch sử thăm khám</h2>
+            </div>
+            <div class="record-pet-control">
+              <label class="field-label" for="records-pet-select">Chọn bé cưng</label>
+              <select id="records-pet-select">
+                <option value="">Đang tải danh sách...</option>
+              </select>
+            </div>
+          </div>
+          <div class="record-list" id="record-list" aria-live="polite">
+            <div class="loading-state"><span class="loader"></span> Đang tải hồ sơ...</div>
+          </div>
+        </section>
+      </section>
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    </main>
+  </div>
+</body>
+</html>
