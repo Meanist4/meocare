@@ -1,6 +1,5 @@
 stages:
   - build
-  - deploy
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
@@ -19,26 +18,3 @@ build_and_test:
     - apt-get update && apt-get install -y --no-install-recommends maven
     - cd meocare
     - mvn clean package -DskipTests
-  artifacts:
-    paths:
-      - meocare/target/*.jar
-    expire_in: 1 day
-
-deploy_to_mon_server:
-  stage: deploy
-  image: alpine:latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-  before_script:
-    - apk add --no-cache openssh-client
-    - eval $(ssh-agent -s)
-    - tr -d '\r' < "$SSH_PRIVATE_KEY" > /tmp/deploy_key
-    - echo >> /tmp/deploy_key
-    - chmod 600 /tmp/deploy_key
-    - ssh-add /tmp/deploy_key
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H 192.168.11.110 >> ~/.ssh/known_hosts
-  script:
-    - scp -o BatchMode=yes meocare/target/*.jar root@192.168.11.110:/opt/meocare/meocare.jar
-    - ssh -o BatchMode=yes root@192.168.11.110 "systemctl restart meocare"
